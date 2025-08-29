@@ -1,50 +1,42 @@
 import { ConflictException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MongoRepository, ObjectId } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Any, MongoRepository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private readonly userRepo: MongoRepository<User>) {
+  constructor(@InjectRepository(User) private readonly userRepository: MongoRepository<User>) {
   }
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      return await this.userRepo.save(createUserDto);
-    } catch (err:any) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+   return await this.userRepository.save(createUserDto).catch((err: any) => { throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR) });
   }
   async findAll() {
-    return await this.userRepo.find();
+    return await this.userRepository.find();
   }
 
   async findOne(_id: string) {
-    return await this.userRepo.find({ _id: new ObjectId(_id) });
+    return await this.userRepository.find({ _id: new ObjectId(_id) });
   }
 
   async findByEmail(email: string) {
-    console.log("here")
-    const user = await this.userRepo.findOneBy({ "email": email } );
-  if (!user) {
+    const user = await this.userRepository.findOneBy({ "email": email });
+    if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
     }
-
-    return user;
+     return user;
   }
 
-
-  async update(id: string, updateUserDto: UpdateUserDto) {
+ async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const result = await this.userRepo.update({ _id: new ObjectId(id) }, updateUserDto);
+      const result = await this.userRepository.update({ _id: new ObjectId(id) }, updateUserDto);
       if (result.raw.matchedCount == 0) {
         throw new HttpException('User not exists', HttpStatus.NOT_FOUND);
       }
-      return await this.userRepo.findOneBy({ _id: new ObjectId(id) });
-    } catch (err:any) {
+      return await this.userRepository.findOneBy({ _id: new ObjectId(id) });
+    } catch (err: any) {
       if (err?.code == 11000) {
         throw new ConflictException('Email already exist ');
       }
@@ -54,6 +46,6 @@ export class UserService {
 
 
   async remove(id: string) {
-    return await this.userRepo.deleteOne({ "_id": new ObjectId(id) })
+    return await this.userRepository.deleteOne({ "_id": new ObjectId(id) })
   }
 }

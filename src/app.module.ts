@@ -23,7 +23,6 @@ import { UserService } from './user/user.service';
        useFactory: async (configService: ConfigService) => ({
         type: 'mongodb',
         url: configService.get<string>('MONGODB_URI'),
-        database: 'newscript',
         entities: [],
         synchronize: true,
         logging: true,
@@ -31,18 +30,14 @@ import { UserService } from './user/user.service';
 
       }),
     }),
+    
      TypeOrmModule.forFeature([User]),
-    JwtModule.register({
+     JwtModule.register({
       global: true,
-      secret: 'super-secret-sign-key', // by  default it will
-      signOptions: { expiresIn: '1h' }, // by default it will 
-    }),
-     
-     
-  
+     }),
 ],
   
-   controllers: [AppController,UserController,AuthController],
+  controllers: [AppController,UserController,AuthController],
    providers: [AppService,UserService,AuthService],
 })
 export class AppModule {}

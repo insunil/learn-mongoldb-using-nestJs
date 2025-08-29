@@ -1,25 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserService } from './user.service';
 
-
-
-@Controller('users')
-export class UserController {
+ @UseGuards(AuthGuard)
+ @Controller('users')
+ export class UserController {
   constructor(private readonly userService: UserService) {}
-   @UseGuards(AuthGuard)
+  
    @Get('profile')
-  async getProfile(@Request() req:any) {
-    console.log("new here")
-
-    const userId = req.locals.userId
-    console.log(req)
+   async getProfile(@Request() req:any) {
+    const userId = req.locals?.userId
     const user = await this.userService.findOne(userId);
     return { message: 'User profile fetched', user };
   }
-
-     
+    
   @Get()
   findAll() {
     return this.userService.findAll();

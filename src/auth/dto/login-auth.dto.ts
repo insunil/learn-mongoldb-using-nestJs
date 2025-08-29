@@ -1,7 +1,7 @@
 import { IsString, IsEmail,IsNotEmpty } from 'class-validator';
 
 export class LoginDto {
-     @IsEmail()
+    @IsEmail()
     @IsNotEmpty()
     email!: string;
 

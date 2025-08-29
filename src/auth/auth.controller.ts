@@ -15,7 +15,5 @@ export class AuthController {
   @Post('/login')
   login(@Body() payload:LoginDto) {
     return this.authService.login(payload);
-  }
-
-  
+  } 
 }

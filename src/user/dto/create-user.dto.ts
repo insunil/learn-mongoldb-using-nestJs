@@ -21,7 +21,7 @@ export class CreateUserDto {
     @IsString()
     gender?: string;
 
- @IsOptional()
+    @IsOptional()
     @IsInt()
     @Min(1)
     @Max(100)
